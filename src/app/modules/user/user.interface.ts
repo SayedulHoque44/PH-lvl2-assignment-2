@@ -1,12 +1,17 @@
-import { Order } from "../order/order.interface";
+// order interface
+export interface TOrder {
+  productName: string;
+  price: number;
+  quantity: number;
+}
 
 // fullName interface
-interface TFullName {
+export interface TFullName {
   firstName: string;
   lastName: string;
 }
 // Address interface
-interface TAddress {
+export interface TAddress {
   street: string;
   city: string;
   country: string;
@@ -23,5 +28,5 @@ export interface TUser {
   isActive: boolean;
   hobbies: Array<string>;
   address: TAddress;
-  orders: Array<Order>;
+  orders?: Array<TOrder>;
 }
