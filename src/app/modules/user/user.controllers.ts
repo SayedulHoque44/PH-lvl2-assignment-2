@@ -27,6 +27,7 @@ const ErrorResMessag = (err: any) => {
   return "Somthing Went Wrong";
 };
 
+// createUser controller
 const createUser = async (req: Request, res: Response) => {
   try {
     const UserData = req.body;
@@ -43,7 +44,51 @@ const createUser = async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     res.status(200).json({
+      success: false,
+      message: ErrorResMessag(err),
+      data: err,
+    });
+  }
+};
+
+// getAllUser controller
+
+const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const result = await UserService.getAllUserFromDB();
+
+    res.status(200).json({
       success: true,
+      message:
+        result.length > 0
+          ? "Users Retrive Successfully!"
+          : "There are no Records",
+      data: result,
+    });
+  } catch (err) {
+    res.status(200).json({
+      success: false,
+      message: ErrorResMessag(err),
+      data: err,
+    });
+  }
+};
+
+// get single user
+const getUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+
+    const result = await UserService.getSingleUserById(Number(userId));
+
+    res.status(200).json({
+      success: true,
+      message: "User Retrive Successfully!",
+      data: result,
+    });
+  } catch (err) {
+    res.status(200).json({
+      success: false,
       message: ErrorResMessag(err),
       data: err,
     });
@@ -53,4 +98,6 @@ const createUser = async (req: Request, res: Response) => {
 // Controllers
 export const UserControllers = {
   createUser,
+  getAllUser,
+  getUser,
 };

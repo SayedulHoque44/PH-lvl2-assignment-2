@@ -90,7 +90,7 @@ const UserSchema = new Schema<TUser>({
   },
 });
 
-// pre ->save
+// pre -> save -> hash the password
 UserSchema.pre("save", async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
@@ -99,11 +99,31 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 // post -> save
-UserSchema.post("save", async function (UpdatedDoc, next) {
-  UpdatedDoc.password = "";
+// UserSchema.post("save", async function (UpdatedDoc, next) {
+//   next();
+// });
 
+// pre -> find -> apply $projection
+
+UserSchema.pre("find", async function (next) {
+  this.find().projection({
+    username: 1,
+    fullName: 1,
+    age: 1,
+    email: 1,
+    address: 1,
+    _id: 0,
+  });
   next();
 });
+
+// --> using buildin methods
+UserSchema.methods.toJSON = function () {
+  const userData = this.toObject();
+
+  delete userData.password;
+  return userData;
+};
 
 // User Model
 export const UserModel = model<TUser>("User", UserSchema);
