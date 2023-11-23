@@ -1,7 +1,13 @@
 import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 import config from "../config";
-import { TAddress, TFullName, TOrder, TUser } from "./user/user.interface";
+import {
+  TAddress,
+  TFullName,
+  TOrder,
+  TUser,
+  UserModelWithMethods,
+} from "./user/user.interface";
 //
 const OrderSchema = new Schema<TOrder>({
   productName: {
@@ -120,10 +126,16 @@ UserSchema.pre("find", async function (next) {
 // --> using buildin methods
 UserSchema.methods.toJSON = function () {
   const userData = this.toObject();
-
   delete userData.password;
   return userData;
 };
+//
+// --> coustom statics --> isUserExists
+UserSchema.statics.isUserExists = function (id) {
+  const existingUser = UserModel.findOne({ userId: id });
+
+  return existingUser;
+};
 
 // User Model
-export const UserModel = model<TUser>("User", UserSchema);
+export const UserModel = model<TUser, UserModelWithMethods>("User", UserSchema);

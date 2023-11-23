@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 // order interface
 export interface TOrder {
   productName: string;
@@ -29,4 +31,8 @@ export interface TUser {
   hobbies: Array<string>;
   address: TAddress;
   orders?: Array<TOrder>;
+}
+
+export interface UserModelWithMethods extends Model<TUser> {
+  isUserExists(id: number): Promise<TUser | null>;
 }

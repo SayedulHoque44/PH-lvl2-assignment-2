@@ -61,7 +61,7 @@ const getAllUser = async (req: Request, res: Response) => {
       success: true,
       message:
         result.length > 0
-          ? "Users Retrive Successfully!"
+          ? "Users fetched successfully!"
           : "There are no Records",
       data: result,
     });
@@ -77,20 +77,47 @@ const getAllUser = async (req: Request, res: Response) => {
 // get single user
 const getUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId;
+    const { userId } = req.params;
 
     const result = await UserService.getSingleUserById(Number(userId));
 
     res.status(200).json({
       success: true,
-      message: "User Retrive Successfully!",
+      message: "User fetched successfully!",
       data: result,
     });
-  } catch (err) {
-    res.status(200).json({
+  } catch (err: any) {
+    res.status(400).json({
       success: false,
-      message: ErrorResMessag(err),
-      data: err,
+      message: err.message,
+      error: {
+        code: 404,
+        description: err.message,
+      },
+    });
+  }
+};
+// update a User
+const updateSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const userData = req.body;
+
+    const result = await UserService.updateUserFromDb(Number(userId), userData);
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully!",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+      error: {
+        code: 404,
+        description: err.message,
+      },
     });
   }
 };
@@ -100,4 +127,5 @@ export const UserControllers = {
   createUser,
   getAllUser,
   getUser,
+  updateSingleUser,
 };

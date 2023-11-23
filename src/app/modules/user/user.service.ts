@@ -15,13 +15,33 @@ const getAllUserFromDB = async function () {
 };
 // get single userById
 const getSingleUserById = async function (id: number) {
-  const result = await UserModel.findOne({ userId: id });
+  // check user found or not
+  const existingUser = await UserModel.isUserExists(id);
 
-  return result;
+  if (existingUser) {
+    return existingUser;
+  } else {
+    throw new Error("User not found");
+  }
+};
+
+// update user by id
+const updateUserFromDb = async function (id: number, userData: TUser) {
+  // check user found or not
+  const existingUser = await UserModel.isUserExists(id);
+
+  if (existingUser) {
+    const result = await UserModel.updateOne({ userId: id }, userData);
+
+    return result;
+  } else {
+    throw new Error("User not found");
+  }
 };
 
 export const UserService = {
   createUserInDb,
   getAllUserFromDB,
   getSingleUserById,
+  updateUserFromDb,
 };
