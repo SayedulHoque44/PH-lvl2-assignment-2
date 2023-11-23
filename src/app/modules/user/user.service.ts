@@ -81,6 +81,53 @@ const getAllOrderFromSpecificUserDB = async (id: number) => {
     throw new Error("User not found");
   }
 };
+// calculateOrder Price
+const calculateOrderPriceOfUserDB = async (id: number) => {
+  const existingUser = await UserModel.isUserExists(id);
+
+  if (existingUser) {
+    if (!(await UserModel.isOrdersHas(id))) {
+      return { totalPrice: 0 };
+    }
+
+    const result = await UserModel.aggregate([
+      // stage-1 get exprectation matched user
+      {
+        $match: {
+          userId: id,
+        },
+      },
+      // stage-1 brekdown the array using $unwing
+      {
+        $unwind: "$orders",
+      },
+      // stage-1 group by name to get all oders total price
+      {
+        $group: {
+          _id: "$username",
+          totalPrice: {
+            $sum: "$orders.price",
+          },
+        },
+      },
+      // stage-1 show data whatever want using $projection
+      {
+        $project: {
+          totalPrice: 1,
+          _id: 0,
+        },
+      },
+
+      {
+        $unwind: "$totalPrice",
+      },
+    ]);
+
+    return result[0];
+  } else {
+    throw new Error("User not found");
+  }
+};
 
 // user service exports
 export const UserService = {
@@ -91,4 +138,5 @@ export const UserService = {
   deleteSingleUserFromDB,
   insertSingleOrderinDB,
   getAllOrderFromSpecificUserDB,
+  calculateOrderPriceOfUserDB,
 };

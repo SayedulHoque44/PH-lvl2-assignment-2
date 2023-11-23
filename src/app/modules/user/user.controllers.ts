@@ -157,10 +157,11 @@ const insertSingleOrder = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const orderData = req.body;
 
-    //
+    // check is user exists
     const existingUser = UserModel.isUserExists(Number(userId));
 
     if (await existingUser) {
+      // exists user
       const orderDataValidate = OrderZodSchema.parse(orderData);
       const result = await UserService.insertSingleOrderinDB(
         Number(userId),
@@ -173,6 +174,7 @@ const insertSingleOrder = async (req: Request, res: Response) => {
         data: result,
       });
     } else {
+      // not exists user
       // to catch user not found err
       res.status(404).json({
         success: false,
@@ -188,7 +190,10 @@ const insertSingleOrder = async (req: Request, res: Response) => {
     res.status(400).json({
       success: false,
       message: ErrorResMessag(err),
-      error: err,
+      error: {
+        code: 404,
+        description: ErrorResMessag(err),
+      },
     });
   }
 };
@@ -218,6 +223,31 @@ const getAllOrderFromSpecificUser = async (req: Request, res: Response) => {
   }
 };
 
+// calculate Order Price Of User
+const calculateOrderPriceOfUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserService.calculateOrderPriceOfUserDB(
+      Number(userId),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Total price calculated successfully!",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+      error: {
+        code: 404,
+        description: err.message,
+      },
+    });
+  }
+};
+
 // Controllers
 export const UserControllers = {
   createUser,
@@ -227,4 +257,5 @@ export const UserControllers = {
   deletUser,
   insertSingleOrder,
   getAllOrderFromSpecificUser,
+  calculateOrderPriceOfUser,
 };

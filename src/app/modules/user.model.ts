@@ -131,11 +131,22 @@ UserSchema.methods.toJSON = function () {
 };
 //
 // --> coustom statics --> isUserExists
-UserSchema.statics.isUserExists = function (id) {
-  const existingUser = UserModel.findOne({ userId: id });
+UserSchema.statics.isUserExists = async function (id: number) {
+  const existingUser = await UserModel.findOne({ userId: id });
 
   return existingUser;
 };
 
+UserSchema.statics.isOrdersHas = async function (id: number) {
+  let hasOrders = false;
+  const user = await this.findOne({ userId: id }, { orders: 1, _id: 0 });
+
+  // keep it mind -> before use this isOrdershas we have to use isUserExits or else user?.orders? has possibility to undefinded
+  if (user?.orders?.length > 0) {
+    hasOrders = true;
+  }
+
+  return hasOrders;
+};
 // User Model
 export const UserModel = model<TUser, UserModelWithMethods>("User", UserSchema);
