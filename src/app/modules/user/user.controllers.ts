@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
+import { UserModel } from "../user.model";
 import { UserService } from "./user.service";
-import { UserZodSchema } from "./user.zod.validation";
+import { OrderZodSchema, UserZodSchema } from "./user.zod.validation";
 
 // custom Error fn
 const ErrorResMessag = (err: any) => {
@@ -22,6 +23,9 @@ const ErrorResMessag = (err: any) => {
       fieldName = i;
     }
     return err.errors[fieldName as string].message;
+  }
+  if (err.message) {
+    return err.message;
   }
 
   return "Somthing Went Wrong";
@@ -122,10 +126,79 @@ const updateSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// delete a user
+const deletUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+    const result = await UserService.deleteSingleUserFromDB(Number(userId));
+
+    res.status(200).json({
+      success: true,
+      message: "User Deleted successfully!",
+      data: null,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+      error: {
+        code: 404,
+        description: err.message,
+      },
+    });
+  }
+};
+
+// insert single order in user
+const insertSingleOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const orderData = req.body;
+
+    //
+    const existingUser = UserModel.isUserExists(Number(userId));
+
+    if (await existingUser) {
+      const orderDataValidate = OrderZodSchema.parse(orderData);
+      const result = await UserService.insertSingleOrderinDB(
+        Number(userId),
+        orderDataValidate,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Order created successfully!",
+        data: result,
+      });
+    } else {
+      // to catch user not found err
+      res.status(404).json({
+        success: false,
+        message: "User not Found!",
+        error: {
+          code: 404,
+          description: "User not Found!",
+        },
+      });
+    }
+  } catch (err: any) {
+    // to catch zod/other error with error message
+    res.status(400).json({
+      success: false,
+      message: ErrorResMessag(err),
+      error: err,
+    });
+  }
+};
+
 // Controllers
 export const UserControllers = {
   createUser,
   getAllUser,
   getUser,
   updateSingleUser,
+  deletUser,
+  insertSingleOrder,
 };
