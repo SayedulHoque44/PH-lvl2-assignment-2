@@ -41,6 +41,7 @@ export const UserZodSchema = z.object({
     .number({ required_error: "Age is Required!" })
     .int()
     .positive({ message: "Age must be a positive integer!" }),
+
   email: z
     .string({ required_error: "Email is Required!" })
     .email({ message: "Invalid email address!" }),

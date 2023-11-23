@@ -10,14 +10,15 @@ app.use(cors());
 // api endpoint
 app.use("/api/users/", UserRoutes);
 
-// Global Error handling middleware
+// Global Error handling middleware for reduce server crash
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send({
     message: "Something went wrong! :(",
     error: {
       code: 500,
-      serverError: err,
       description: "Please Check Your Data or Code",
+      serverError: err,
     },
   });
 });

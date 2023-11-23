@@ -106,7 +106,9 @@ const calculateOrderPriceOfUserDB = async (id: number) => {
         $group: {
           _id: "$username",
           totalPrice: {
-            $sum: "$orders.price",
+            $sum: {
+              $multiply: ["$orders.quantity", "$orders.price"],
+            },
           },
         },
       },

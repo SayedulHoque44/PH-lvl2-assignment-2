@@ -163,6 +163,7 @@ const insertSingleOrder = async (req: Request, res: Response) => {
     if (await existingUser) {
       // exists user
       const orderDataValidate = OrderZodSchema.parse(orderData);
+      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       const result = await UserService.insertSingleOrderinDB(
         Number(userId),
         orderDataValidate,
@@ -171,7 +172,7 @@ const insertSingleOrder = async (req: Request, res: Response) => {
       res.status(200).json({
         success: true,
         message: "Order created successfully!",
-        data: result,
+        data: null,
       });
     } else {
       // not exists user
