@@ -66,6 +66,23 @@ const insertSingleOrderinDB = async (id: number, singleOrder: TOrder) => {
   return result;
 };
 
+// get all order from specific user
+const getAllOrderFromSpecificUserDB = async (id: number) => {
+  const existingUser = await UserModel.isUserExists(id);
+
+  if (existingUser) {
+    const result = await UserModel.findOne(
+      { userId: id },
+      { orders: 1, _id: 0 },
+    );
+
+    return result;
+  } else {
+    throw new Error("User not found");
+  }
+};
+
+// user service exports
 export const UserService = {
   createUserInDb,
   getAllUserFromDB,
@@ -73,4 +90,5 @@ export const UserService = {
   updateUserFromDb,
   deleteSingleUserFromDB,
   insertSingleOrderinDB,
+  getAllOrderFromSpecificUserDB,
 };

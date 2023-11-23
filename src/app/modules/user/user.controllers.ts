@@ -193,6 +193,31 @@ const insertSingleOrder = async (req: Request, res: Response) => {
   }
 };
 
+// get all order from db
+const getAllOrderFromSpecificUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserService.getAllOrderFromSpecificUserDB(
+      Number(userId),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Orders Retrive successfully!",
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+      error: {
+        code: 404,
+        description: err.message,
+      },
+    });
+  }
+};
+
 // Controllers
 export const UserControllers = {
   createUser,
@@ -201,4 +226,5 @@ export const UserControllers = {
   updateSingleUser,
   deletUser,
   insertSingleOrder,
+  getAllOrderFromSpecificUser,
 };
