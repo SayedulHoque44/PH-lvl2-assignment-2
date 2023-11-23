@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserControllers = void 0;
+const user_model_1 = require("../user.model");
 const user_service_1 = require("./user.service");
 const user_zod_validation_1 = require("./user.zod.validation");
 // custom Error fn
@@ -30,6 +31,9 @@ const ErrorResMessag = (err) => {
             fieldName = i;
         }
         return err.errors[fieldName].message;
+    }
+    if (err.message) {
+        return err.message;
     }
     return "Somthing Went Wrong";
 };
@@ -123,11 +127,99 @@ const updateSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
 const deletUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
         const result = yield user_service_1.UserService.deleteSingleUserFromDB(Number(userId));
         res.status(200).json({
             success: true,
             message: "User Deleted successfully!",
             data: null,
+        });
+    }
+    catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message,
+            error: {
+                code: 404,
+                description: err.message,
+            },
+        });
+    }
+});
+// insert single order in user
+const insertSingleOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const orderData = req.body;
+        // check is user exists
+        const existingUser = user_model_1.UserModel.isUserExists(Number(userId));
+        if (yield existingUser) {
+            // exists user
+            const orderDataValidate = user_zod_validation_1.OrderZodSchema.parse(orderData);
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+            const result = yield user_service_1.UserService.insertSingleOrderinDB(Number(userId), orderDataValidate);
+            res.status(200).json({
+                success: true,
+                message: "Order created successfully!",
+                data: null,
+            });
+        }
+        else {
+            // not exists user
+            // to catch user not found err
+            res.status(404).json({
+                success: false,
+                message: "User not Found!",
+                error: {
+                    code: 404,
+                    description: "User not Found!",
+                },
+            });
+        }
+    }
+    catch (err) {
+        // to catch zod/other error with error message
+        res.status(400).json({
+            success: false,
+            message: ErrorResMessag(err),
+            error: {
+                code: 404,
+                description: ErrorResMessag(err),
+            },
+        });
+    }
+});
+// get all order from db
+const getAllOrderFromSpecificUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield user_service_1.UserService.getAllOrderFromSpecificUserDB(Number(userId));
+        res.status(200).json({
+            success: true,
+            message: "Orders Retrive successfully!",
+            data: result,
+        });
+    }
+    catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message,
+            error: {
+                code: 404,
+                description: err.message,
+            },
+        });
+    }
+});
+// calculate Order Price Of User
+const calculateOrderPriceOfUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield user_service_1.UserService.calculateOrderPriceOfUserDB(Number(userId));
+        res.status(200).json({
+            success: true,
+            message: "Total price calculated successfully!",
+            data: result,
         });
     }
     catch (err) {
@@ -148,4 +240,7 @@ exports.UserControllers = {
     getUser,
     updateSingleUser,
     deletUser,
+    insertSingleOrder,
+    getAllOrderFromSpecificUser,
+    calculateOrderPriceOfUser,
 };

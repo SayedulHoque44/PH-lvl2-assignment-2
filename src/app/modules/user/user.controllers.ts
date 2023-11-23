@@ -36,31 +36,36 @@ const createUser = async (req: Request, res: Response) => {
   try {
     const UserData = req.body;
 
+    // Zod validation
     const UserZodVal = UserZodSchema.parse(UserData);
 
-    // db req
+    // create user req
     const result = await UserService.createUserInDb(UserZodVal);
 
+    //success respone
     res.status(200).json({
       success: true,
       message: "User Created Successfully!",
       data: result,
     });
   } catch (err: any) {
-    res.status(200).json({
+    // Error Response
+    res.status(400).json({
       success: false,
       message: ErrorResMessag(err),
-      data: err,
+      error: {
+        code: 400,
+        description: ErrorResMessag(err),
+      },
     });
   }
 };
 
 // getAllUser controller
-
 const getAllUser = async (req: Request, res: Response) => {
   try {
     const result = await UserService.getAllUserFromDB();
-
+    //success respone
     res.status(200).json({
       success: true,
       message:
@@ -69,11 +74,14 @@ const getAllUser = async (req: Request, res: Response) => {
           : "There are no Records",
       data: result,
     });
-  } catch (err) {
-    res.status(200).json({
+  } catch (err: any) {
+    res.status(400).json({
       success: false,
       message: ErrorResMessag(err),
-      data: err,
+      error: {
+        code: 404,
+        description: err.message,
+      },
     });
   }
 };
@@ -84,14 +92,14 @@ const getUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const result = await UserService.getSingleUserById(Number(userId));
-
+    //success respone
     res.status(200).json({
       success: true,
       message: "User fetched successfully!",
       data: result,
     });
   } catch (err: any) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: err.message,
       error: {
@@ -108,7 +116,7 @@ const updateSingleUser = async (req: Request, res: Response) => {
     const userData = req.body;
 
     const result = await UserService.updateUserFromDb(Number(userId), userData);
-
+    //success respone
     res.status(200).json({
       success: true,
       message: "User updated successfully!",
@@ -133,7 +141,7 @@ const deletUser = async (req: Request, res: Response) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     const result = await UserService.deleteSingleUserFromDB(Number(userId));
-
+    //success respone
     res.status(200).json({
       success: true,
       message: "User Deleted successfully!",
@@ -168,7 +176,7 @@ const insertSingleOrder = async (req: Request, res: Response) => {
         Number(userId),
         orderDataValidate,
       );
-
+      //success respone
       res.status(200).json({
         success: true,
         message: "Order created successfully!",
@@ -206,7 +214,7 @@ const getAllOrderFromSpecificUser = async (req: Request, res: Response) => {
     const result = await UserService.getAllOrderFromSpecificUserDB(
       Number(userId),
     );
-
+    //success respone
     res.status(200).json({
       success: true,
       message: "Orders Retrive successfully!",
@@ -231,7 +239,7 @@ const calculateOrderPriceOfUser = async (req: Request, res: Response) => {
     const result = await UserService.calculateOrderPriceOfUserDB(
       Number(userId),
     );
-
+    //success respone
     res.status(200).json({
       success: true,
       message: "Total price calculated successfully!",

@@ -137,8 +137,22 @@ UserSchema.methods.toJSON = function () {
 //
 // --> coustom statics --> isUserExists
 UserSchema.statics.isUserExists = function (id) {
-    const existingUser = exports.UserModel.findOne({ userId: id });
-    return existingUser;
+    return __awaiter(this, void 0, void 0, function* () {
+        const existingUser = yield exports.UserModel.findOne({ userId: id });
+        return existingUser;
+    });
+};
+UserSchema.statics.isOrdersHas = function (id) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        let hasOrders = false;
+        const user = yield this.findOne({ userId: id }, { orders: 1, _id: 0 });
+        // keep it mind -> before use this isOrdershas we have to use isUserExits or else user?.orders? has possibility to undefinded
+        if (((_a = user === null || user === void 0 ? void 0 : user.orders) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            hasOrders = true;
+        }
+        return hasOrders;
+    });
 };
 // User Model
 exports.UserModel = (0, mongoose_1.model)("User", UserSchema);
