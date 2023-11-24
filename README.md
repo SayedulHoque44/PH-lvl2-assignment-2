@@ -1,5 +1,11 @@
 # [PH-lvl2-assignment-2-Server](https://lvl2-assignment-2.vercel.app/)
 
+## Run
+
+- developement `npm run dev` -> "dev": "tsnd --respawn ./src/server.ts"
+- build `npm run build` -> "build": "tsc",
+- start the server `npm run start` -> "start": "node ./dist/server.js"
+
 ## Uses ->
 
 - An user can create account for him/her
