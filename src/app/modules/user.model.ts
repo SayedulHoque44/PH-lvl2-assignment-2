@@ -130,13 +130,13 @@ UserSchema.methods.toJSON = function () {
   return userData;
 };
 //
-// --> coustom statics --> isUserExists
+// --> coustom statics method --> isUserExists
 UserSchema.statics.isUserExists = async function (id: number) {
   const existingUser = await UserModel.findOne({ userId: id });
 
   return existingUser;
 };
-
+// --> coustom statics method --> isOrdersHas
 UserSchema.statics.isOrdersHas = async function (id: number) {
   let hasOrders = false;
   const user = await this.findOne({ userId: id }, { orders: 1, _id: 0 });
